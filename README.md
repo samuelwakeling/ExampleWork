@@ -1,8 +1,8 @@
 # Hello
 
-This is a repo to store some examples of my work for potential employment. 
+This is a repo to store some examples of my work. The main motivation being so that employers can see examples of work I have done.
 
-These projects represent personal projects, often done with limited time and on a 'get things done' basis. They were never intended to be published, but seeing I can't provide examples of my actual work, this is the next best thing. 
+These projects represent personal projects, often done with limited time and on a 'get things done' basis.
 
 If you aren't and employer, and are instead thinking of using the code for your own project, feel free to.
 
