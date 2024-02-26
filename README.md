@@ -1,6 +1,6 @@
 # Hello
 
-This is a repo to store some examples of my work. The main motivation being so that employers can see examples of work I have done.
+This is a repo to store some examples of my work. The main motivation being that employers can see examples of work I have done.
 
 These projects represent personal projects, often done with limited time and on a 'get things done' basis.
 
