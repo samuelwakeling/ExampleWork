@@ -1,0 +1,74 @@
+---
+title: "Support for Marriage Equality in Australia"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(questionr)
+library(reshape2)
+library(networkD3)
+library(dplyr)
+```
+
+```{r pressure, echo=FALSE}
+
+aeswide <- read.csv("~/Documents/Data/AES/2_ADA.WIDEFILE/aespanel.csv")
+
+snakeyd <- aeswide %>% select(E4.16, E4.19, weight_long_enrolled.19)
+
+snakeyd <- snakeyd %>% mutate(nineteen = case_when(E4.19 == 1 ~ 4, 
+                                                   E4.19 == 2 ~ 5, 
+                                                   E4.19 == 3 ~ 6, 
+                                                   E4.19 == 4 ~ 7, 
+                                                   E4.19 == 999 ~ 9))
+
+snakeyd$sixteen <- 0
+snakeyd <- snakeyd %>% mutate(sixteen = ifelse(E4.16<10, E4.16 - 1, 4))
+
+snakeyd <- snakeyd %>% select(sixteen, nineteen, weight_long_enrolled.19)
+
+#prop(wtd.table(aeswide$E4.16, aeswide$E4.19, weights = aeswide$weight_long_enrolled.19))
+
+a<-tabs(snakeyd, x='sixteen', y='nineteen', weight = 'weight_long_enrolled.19')
+
+a <- melt(a)
+
+a <- a %>% filter(Var2 != "Overall")
+a <- a %>% arrange(Var1)
+a<- a %>% filter(Var1 !=4 & Var2 !=9)
+a$Var2 <- as.integer(as.character(a$Var2))
+
+my_color <- 'd3.scaleOrdinal() .domain(["z","reverse", "progress", "pos", "neg"]) .range(["lightgrey", "#69b3a2" , "steelblue", "#69b3a2","steelblue"])'
+
+nodes = data.frame("name" = 
+                     c("Strongly Favour",
+                       "Favour",
+                       "Oppose",
+                       "Strongly Oppose",
+                       "Strongly Favour", 
+                       "Favour", 
+                       "Oppose", 
+                       "Strongly Oppose")) 
+links = a
+links$group <- as.factor(c("z", "z", "reverse", "reverse", "z", "z", "reverse", "reverse","progress", "progress", "z", "z","progress", "progress", "z", "z"))
+nodes$group <- as.factor(c("pos", "pos", "neg", "neg","pos", "pos", "neg", "neg"))
+names(links) = c("source", "target", "value", "group")
+
+sankey <- sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "source", Target = "target",
+              Value = "value", NodeID = "name",
+              fontSize= 12, nodeWidth = 15, colourScale=my_color, LinkGroup="group", NodeGroup="group")
+sankey <- htmlwidgets::prependContent(sankey, htmltools::tags$h1("2016 ------------------------------------> 2019"))
+
+sankey
+```
+This data is from the Australia Election Study. It uses the longitudinal panel (n=814) for years 2016 and 2019. The analysis uses the longitudinal weights provided.
+
+This analysis was inspired by the YANNS podcast, ep 152 - status quo rationalisation, where the guest talks about research into how people change their position on topics after they have become legislated (or reality). In the podcast, the host and guest ponder whether this would have been the case for marriage equality in the US. 
+
+This analysis suggests this may have been the case in Australia. Where 40% (4% of 10%) of those who opposed changed to a supportive view, and 18% (3% of 17%) of those who strongly opposed changed to a supportive view.There was also movement in the opposite direction with 14% (4% of 27%) changed from favouring to opposing. 
+
+Of course this is only 1 aspect of the story. The most obvious finding is that 70% of the Australian population in 2016 supported marriage equality, pre-legislation. 
+
+Cross-sectional data from the AES is presented at: https://australianelectionstudy.org/interactive-charts/ 
