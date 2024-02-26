@@ -4,6 +4,9 @@ This is a repo to store some examples of my work. The main motivation being that
 
 These projects represent personal projects, often done with limited time and on a 'get things done' basis.
 
+Currently the repo has in it: 
+- Lambda_function(
+
 If you aren't and employer, and are instead thinking of using the code for your own project, feel free to.
 
 Enjoy, 
