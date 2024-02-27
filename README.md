@@ -15,5 +15,5 @@ If you aren't and employer and are instead thinking of using the code for your o
 
 Enjoy, 
 Sam
-![image](https://github.com/samuelwakeling/ExampleWork/assets/79378666/058e6d17-fbed-4f73-923c-c636efe0083d)
+
 
