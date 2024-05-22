@@ -26,13 +26,13 @@ def lambda_handler(event, context):
 
   prices = requests.request("GET", url_prices, headers=headers)
 
-  b = json.loads(prices.text)
-  c = pd.json_normalize(b['SitePrices'])
+  df_fuel_price = json.loads(prices.text)
+  df_fuel_price_cleaned = pd.json_normalize(df_fuel_price['SitePrices'])
   
-  c['Price'] = c['Price']/10 #take it to cents.
-  c = c.loc[c["Price"] != 999.9]
-  c = c.loc[c["Price"] != 888.8]
-  c = c.loc[c["Price"] != 0]
+  df_fuel_price_cleaned['Price'] = df_fuel_price_cleaned['Price']/10 #take it to cents.
+  df_fuel_price_cleaned = df_fuel_price_cleaned.loc[df_fuel_price_cleaned["Price"] != 999.9]
+  df_fuel_price_cleaned = df_fuel_price_cleaned.loc[df_fuel_price_cleaned["Price"] != 888.8]
+  df_fuel_price_cleaned = df_fuel_price_cleaned.loc[df_fuel_price_cleaned["Price"] != 0]
 
 # request fuel type mapping file (digit coding to name of fuel)
   url_fueltypes = "https://fppdirectapi-prod.fuelpricesqld.com.au/Subscriber/GetCountryFuelTypes?countryId=21"
@@ -44,15 +44,15 @@ def lambda_handler(event, context):
 
   fuel_types = requests.request("GET", url_fueltypes, headers=headers2)
 
-  d = json.loads(fuel_types.text)
-  e = pd.json_normalize(d['Fuels'])
+  df_fuel_types = json.loads(fuel_types.text)
+  df_fuel_types = pd.json_normalize(df_fuel_types['Fuels'])
 
 #join types/names to fueltype IDs. 
-  df = pd.merge(c,e, on='FuelId', how = 'inner')
+  df_daily_fuel_prices = pd.merge(df_fuel_price_cleaned, df_fuel_types, on='FuelId', how = 'inner')
 
 #convert to csv in temp file to write to s3
   csv_buffer = io.StringIO()
-  df.to_csv(csv_buffer)
+  df_daily_fuel_prices.to_csv(csv_buffer)
 
   file_contents = csv_buffer.getvalue()
 
@@ -77,7 +77,7 @@ def lambda_handler(event, context):
       a = np.log(x)
       return np.exp(a.mean())
 
-  daily_means = df.groupby("Name").Price.agg([pd.Series.mean, pd.Series.median, geometric_mean])
+  daily_means = df_daily_fuel_prices.groupby("Name").Price.agg([pd.Series.mean, pd.Series.median, geometric_mean])
 
   daily_means = daily_means.reset_index()
 
